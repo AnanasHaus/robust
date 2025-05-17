@@ -40,7 +40,7 @@ public class PlayerFactory implements EntityFactory {
                 .onClick(tank -> {
                     if (MapService.isTargetSelectionActive()) {
 
-                        // Entferne gelbe Auswahl (falls z. B. fälschlich gesetzt)
+                        // Entferne gelbe Auswahl (falls z.B. fälschlich gesetzt)
                         if (tank.hasComponent(SelectableComponent.class)) {
                             tank.removeComponent(SelectableComponent.class);
                         }

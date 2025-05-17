@@ -12,7 +12,7 @@ public class SelectableTargetComponent extends Component {
     public void onAdded() {
         System.out.println("SelectableTargetComponent hinzugefügt zu: " + entity);
 
-        // Lade das rote Rechteck (z. B. 72x72)
+        // Lade das rote Rechteck (z.B. 72x72)
         targetSelectionMarker = FXGL.getAssetLoader().loadTexture("targetselection.png");
 
         // Verschiebung für Zentrierung
