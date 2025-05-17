@@ -3,6 +3,7 @@ package com.robustgames.robustclient.business.logic;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.robustgames.robustclient.business.entitiy.components.SelectableComponent;
+import com.robustgames.robustclient.business.entitiy.components.SelectableTargetComponent;
 import javafx.geometry.Point2D;
 
 /**
@@ -15,6 +16,9 @@ public class MapService {
     private static final int TILE_HEIGHT = 64;
     private static final int ISO_TILE_ORIGIN_X = 5;
     private static final int ISO_TILE_ORIGIN_Y = 0; //aktuell 0 aber evtl. 1 in zukunft
+
+    // Zielauswahl
+    private static boolean targetSelectionActive = false;
 
     public static Point2D isoScreenToGrid(Point2D screenPos) {
         Point2D gridPos2D = new Point2D(screenPos.getX()/TILE_WIDTH_ISO, screenPos.getY()/TILE_HEIGHT);
@@ -49,9 +53,29 @@ public class MapService {
         }
         return null;
     }
+
     public static void deSelectPreviousTank(){
         Entity tank = findSelectedTank();
         if (tank != null)
             tank.removeComponent(SelectableComponent.class);
+        targetSelectionActive = false;
+    }
+
+    public static void startTargetSelection() {
+        targetSelectionActive = true;
+    }
+
+    public static boolean isTargetSelectionActive() {
+        return targetSelectionActive;
+    }
+
+    public static void cancelTargetSelection() {
+        targetSelectionActive = false;
+
+        for (Entity entity : FXGL.getGameWorld().getEntities()) {
+            if (entity.hasComponent(SelectableTargetComponent.class)) {
+                entity.removeComponent(SelectableTargetComponent.class);
+            }
+        }
     }
 }

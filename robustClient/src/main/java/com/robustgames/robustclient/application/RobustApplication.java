@@ -84,7 +84,22 @@ public class RobustApplication extends GameApplication  {
                 tank.getComponent(RotateComponent.class).rotateRight();
         });
 
+        // Zielauswahl aktivieren
+        onBtnDown(MouseButton.SECONDARY, () -> {
+            var selectedTank = MapService.findSelectedTank();
+            if (selectedTank != null) {
+                MapService.startTargetSelection();
+                System.out.println("Zielauswahlmodus aktiviert.");
+            } else {
+                System.out.println("Kein Panzer ausgewählt – Zielmodus nicht möglich.");
+            }
+        });
 
+        // Zielauswahl abbrechen
+        onKeyDown(KeyCode.Z, () -> {
+            MapService.cancelTargetSelection();
+            System.out.println("Zielauswahlmodus deaktiviert.");
+        });
     }
 
     //HUD und UI

@@ -7,6 +7,7 @@ import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.Spawns;
 import com.robustgames.robustclient.business.entitiy.components.RotateComponent;
 import com.robustgames.robustclient.business.entitiy.components.SelectableComponent;
+import com.robustgames.robustclient.business.entitiy.components.SelectableTargetComponent;
 import com.robustgames.robustclient.business.logic.MapService;
 
 public class PlayerFactory implements EntityFactory {
@@ -19,28 +20,48 @@ public class PlayerFactory implements EntityFactory {
                 .onClick(tank ->{
                     MapService.deSelectPreviousTank();
                     tank.addComponent(new SelectableComponent());
+                    MapService.startTargetSelection();
                 })
                 .build();
     }
+
     @Spawns("city1")
     public Entity spawnCityPlayer1(SpawnData data) {
         return FXGL.entityBuilder(data)
                 .viewWithBBox("city2D.png").onClick(System.out::println)
                 .build();
     }
+
     @Spawns("tank2")
     public Entity spawnTankPlayer2(SpawnData data) {
         return FXGL.entityBuilder(data)
                 .viewWithBBox("tank2D_right.png")
                 .with(new RotateComponent())
-                .onClick(tank ->{
-                    MapService.deSelectPreviousTank();
-                    tank.addComponent(new SelectableComponent());
+                .onClick(tank -> {
+                    if (MapService.isTargetSelectionActive()) {
+
+                        // Entferne gelbe Auswahl (falls z. B. fälschlich gesetzt)
+                        if (tank.hasComponent(SelectableComponent.class)) {
+                            tank.removeComponent(SelectableComponent.class);
+                        }
+
+                        // Rote Zielmarkierung hinzufügen
+                        if (!tank.hasComponent(SelectableTargetComponent.class)) {
+                            tank.addComponent(new SelectableTargetComponent());
+                            System.out.println("Target selected: " + tank);
+                        }
+
+                        // Zielmodus beenden
+                        MapService.cancelTargetSelection();
+
+                    } else {
+                        // Kein Zielmodus: Klick auf Gegner hat keine Wirkung
+                        System.out.println("Gegnerischer Panzer – nicht auswählbar.");
+                    }
                 })
-
-
                 .build();
     }
+
     @Spawns("city2")
     public Entity spawnCityPlayer2(SpawnData data) {
         return FXGL.entityBuilder(data)
