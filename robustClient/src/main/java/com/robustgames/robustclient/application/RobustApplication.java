@@ -41,6 +41,7 @@ public class RobustApplication extends GameApplication  {
 
     @Override
     protected void initInput() {
+
         //Click Debug
 //        onBtnDown(MouseButton.PRIMARY, () -> {
 //            Point2D mouseWorldPos = FXGL.getInput().getMousePositionWorld();
@@ -53,7 +54,7 @@ public class RobustApplication extends GameApplication  {
 //        });
     }
 
-    @Override
+    @Override6
     protected void initUI() {
         selectionView.setVisible(false);
 
