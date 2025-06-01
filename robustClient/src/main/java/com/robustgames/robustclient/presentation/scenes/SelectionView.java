@@ -88,7 +88,7 @@ public class SelectionView extends Pane {
         // DEBUG DEBUG DEBUG DEBUG
         Button btnSendTurn = new Button("Test Server");
         btnSendTurn.setOnAction(e -> {
-            new Thread(() -> { // Netzwerkrequest immer außerhalb des JavaFX/FXGL-Threads!
+            new Thread(() -> { // Netzwerkrequest immer außerhalb des JavaFX/FXGL-Threads, sonst friert die UI ein!
                 try {
                     String state = ServerApi.getGameState();
                     System.out.println("Aktueller Spielstand: " + state);
