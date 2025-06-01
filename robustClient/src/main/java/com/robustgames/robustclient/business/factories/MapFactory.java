@@ -76,6 +76,7 @@ public class MapFactory implements EntityFactory {
                 .viewWithBBox("Tile_move_selection.png")
                 .build();
     }
+
     @Spawns("AttackTargetTiles")
     public Entity spawnAttackTargetTiles(SpawnData data) {
         //rein visuell, braucht eigene methode

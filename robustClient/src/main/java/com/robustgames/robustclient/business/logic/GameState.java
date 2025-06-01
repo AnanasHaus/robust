@@ -4,7 +4,7 @@ import static com.almasb.fxgl.dsl.FXGL.getDialogService;
 import static com.almasb.fxgl.dsl.FXGL.getGameController;
 
 /**
- *  Manages turn order, win conditions, etc.
+ * Manages turn order, win conditions, etc.
  */
 //TODO turn order
 public class GameState {

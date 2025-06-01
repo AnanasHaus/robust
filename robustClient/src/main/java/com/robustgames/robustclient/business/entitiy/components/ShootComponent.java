@@ -25,8 +25,7 @@ public class ShootComponent extends Component {
                 current = step(current, dir); // Einen Schritt in die Richtung gehen
 
                 // Prüfe Map-Grenzen
-                if (!MapService.isValidTile(current))
-                    break;
+                if (!MapService.isValidTile(current)) break;
 
                 // Prüfe, ob dort ein Berg ist
                 if (MapService.hasMountainAt(current)) {

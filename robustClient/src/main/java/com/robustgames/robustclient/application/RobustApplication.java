@@ -25,10 +25,11 @@ import static com.almasb.fxgl.dsl.FXGL.*;
 import static com.robustgames.robustclient.business.entitiy.EntityType.MOUNTAIN;
 import static com.robustgames.robustclient.business.entitiy.EntityType.TILE;
 
-public class RobustApplication extends GameApplication  {
+public class RobustApplication extends GameApplication {
     private static final int WIDTH = 1280;
     private static final int HEIGHT = 720;
     SelectionView selectionView;
+
     //Window settings
     @Override
     protected void initSettings(GameSettings settings) {
@@ -54,8 +55,7 @@ public class RobustApplication extends GameApplication  {
                         + "\northogonal Screen To Grid = " + gridPos
                         + "\northogonal Grid To Screen = " + MapService.orthGridToScreen(gridPos.getX(), gridPos.getY()));
             });
-        }
-        else if (whatWorld.equals("isometric")) {
+        } else if (whatWorld.equals("isometric")) {
             onBtnDown(MouseButton.PRIMARY, () -> {
                 Point2D mouseWorldPos = FXGL.getInput().getMousePositionWorld();
                 Point2D gridPos = MapService.isoScreenToGrid(mouseWorldPos);
@@ -102,10 +102,11 @@ public class RobustApplication extends GameApplication  {
         label.setFont(Font.font(20.0));
         FXGL.addUINode(label, 350.0, 290.0);*/
     }
+
     public void onTankClicked(Entity tank) {
 
 
-    //    selectionView.setCell(tank);
+        //    selectionView.setCell(tank);
         selectionView.setVisible(true);
 
         //var x = tank.getX() > getAppWidth() / 2.0 ? tank.getX() - 250 : tank.getX();
@@ -113,6 +114,7 @@ public class RobustApplication extends GameApplication  {
 //        towerSelectionBox.setTranslateX(x);
 //        towerSelectionBox.setTranslateY(tank.getY());
     }
+
     @Override
     protected void initPhysics() {
         var shellTank = new ShellTankHandler();
@@ -141,7 +143,7 @@ public class RobustApplication extends GameApplication  {
             if (entity.isType(TILE))
                 entity.setPosition(isoGridPos.getX(), isoGridPos.getY());
             else
-                entity.setPosition(isoGridPos.getX()-64, isoGridPos.getY()-64);
+                entity.setPosition(isoGridPos.getX() - 64, isoGridPos.getY() - 64);
         }
         //ISOMETRISCHE MAP TRIGGER ISOMETRISCHE MAP TRIGGER ISOMETRISCHE MAP TRIGGER ISOMETRISCHE MAP TRIGGER
     }

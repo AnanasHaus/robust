@@ -1,11 +1,17 @@
 package com.robustgames.robustclient.presentation.scenes;
 
-import com.almasb.fxgl.dsl.FXGL;
-import com.almasb.fxgl.entity.Entity;
 import com.robustgames.robustclient.business.entitiy.components.MovementComponent;
 import com.robustgames.robustclient.business.entitiy.components.RotateComponent;
 import com.robustgames.robustclient.business.entitiy.components.ShootComponent;
+
+
 import com.robustgames.robustclient.business.logic.MapService;
+import com.robustgames.robustclient.business.network.ServerApi;
+
+import static com.robustgames.robustclient.business.entitiy.EntityType.ACTIONSELECTION;
+
+import com.almasb.fxgl.dsl.FXGL;
+import com.almasb.fxgl.entity.Entity;
 import javafx.util.Duration;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -15,7 +21,7 @@ import javafx.scene.layout.Pane;
 import static com.almasb.fxgl.dsl.FXGL.getAppHeight;
 import static com.almasb.fxgl.dsl.FXGL.getAppWidth;
 import static com.almasb.fxgl.dsl.FXGLForKtKt.getGameWorld;
-import static com.robustgames.robustclient.business.entitiy.EntityType.ACTIONSELECTION;
+
 import static com.almasb.fxgl.dsl.FXGL.byType;
 
 
@@ -24,8 +30,6 @@ public class SelectionView extends Pane {
     Button btnShoot;
     Button btnRotateLeft;
     Button btnRotateRight;
-
-
 
 
     public SelectionView() {
@@ -81,10 +85,27 @@ public class SelectionView extends Pane {
 
         });
 
+        // DEBUG DEBUG DEBUG DEBUG
+        Button btnSendTurn = new Button("Test Server");
+        btnSendTurn.setOnAction(e -> {
+            new Thread(() -> { // Netzwerkrequest immer außerhalb des JavaFX/FXGL-Threads!
+                try {
+                    String state = ServerApi.getGameState();
+                    System.out.println("Aktueller Spielstand: " + state);
+
+                    String antwort = ServerApi.postTurn("Testzug von robustClient");
+                    System.out.println("Antwort vom Server: " + antwort);
+
+                    String neuerState = ServerApi.getGameState();
+                    System.out.println("Neuer Spielstand: " + neuerState);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }).start();
+        });
+
         HBox box = new HBox(10);
-        box.getChildren().addAll(
-                btnMove, btnShoot, btnRotateLeft, btnRotateRight
-        );
+        box.getChildren().addAll(btnMove, btnShoot, btnRotateLeft, btnRotateRight, btnSendTurn);
         box.setAlignment(Pos.CENTER);
         box.setTranslateX(getAppWidth() / 4.0 - 300);
         box.setTranslateY(getAppHeight() - 50);

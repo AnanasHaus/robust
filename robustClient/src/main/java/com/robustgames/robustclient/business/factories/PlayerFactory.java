@@ -20,7 +20,7 @@ public class PlayerFactory implements EntityFactory {
         return FXGL.entityBuilder(data)
                 .viewWithBBox("tank_top_left.png")
                 .with(new RotateComponent())
-                .onClick(tank ->{
+                .onClick(tank -> {
                     //TODO Make the tile that the tank is standing on, also select the tank. i.e. add a tank property to hovertile
                     MapService.deSelectTank();
                     tank.addComponent(new SelectableComponent());
@@ -29,7 +29,7 @@ public class PlayerFactory implements EntityFactory {
                 })
                 .build();
     }
-  
+
     @Spawns("city1")
     public Entity spawnCityPlayer1(SpawnData data) {
         return FXGL.entityBuilder(data)
@@ -37,14 +37,14 @@ public class PlayerFactory implements EntityFactory {
                 .viewWithBBox("city1.png").onClick(System.out::println)
                 .build();
     }
-  
+
     @Spawns("tank2")
     public Entity spawnTankPlayer2(SpawnData data) {
         return FXGL.entityBuilder(data)
                 .type(TANK)
                 .viewWithBBox("tank_down_right.png")
                 .with(new RotateComponent())
-                .onClick(tank ->{
+                .onClick(tank -> {
                     //TODO Make the tile that the tank is standing on, also select the tank. i.e. add a tank property to hovertile
                     MapService.deSelectTank();
                     tank.addComponent(new SelectableComponent());
@@ -53,7 +53,7 @@ public class PlayerFactory implements EntityFactory {
                 })
                 .build();
     }
-  
+
     @Spawns("city2")
     public Entity spawnCityPlayer2(SpawnData data) {
         return FXGL.entityBuilder(data)

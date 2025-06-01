@@ -11,7 +11,7 @@ public class MovementService {
         Entity selectedTank = MapService.findSelectedTank();
         if (selectedTank != null) {
             Point2D target = clickedCell.getPosition(); //TODO hier checken, ob man selecten darf
-            selectedTank.setPosition(target.getX()-64, target.getY()-64);
+            selectedTank.setPosition(target.getX() - 64, target.getY() - 64);
             selectedTank.removeComponent(SelectableComponent.class); //Für später (dann auch bei shoot)
         }
     }

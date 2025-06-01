@@ -5,8 +5,10 @@ import com.almasb.fxgl.entity.Entity;
 import com.robustgames.robustclient.business.entitiy.EntityType;
 import com.robustgames.robustclient.business.entitiy.components.SelectableComponent;
 import javafx.geometry.Point2D;
+
 import java.util.HashSet;
 import java.util.Set;
+
 import com.robustgames.robustclient.business.logic.Direction;
 
 /**
@@ -28,11 +30,12 @@ public class MapService {
      * @return the corresponding position in grid coordinates
      */
     public static Point2D isoScreenToGrid(Point2D screenPos) {
-        Point2D gridPos2D = new Point2D(screenPos.getX()/TILE_WIDTH_ISO, screenPos.getY()/TILE_HEIGHT);
+        Point2D gridPos2D = new Point2D(screenPos.getX() / TILE_WIDTH_ISO, screenPos.getY() / TILE_HEIGHT);
         int x = (int) ((gridPos2D.getY() - ISO_TILE_ORIGIN_Y) + (gridPos2D.getX() - ISO_TILE_ORIGIN_X));
         int y = (int) ((gridPos2D.getY() - ISO_TILE_ORIGIN_Y) - (gridPos2D.getX() - ISO_TILE_ORIGIN_X));
         return new Point2D(x, y);
     }
+
     /**
      * Converts an isometric grid position represented by a {@link Point2D}
      * to its corresponding screen coordinates.
@@ -43,6 +46,7 @@ public class MapService {
     public static Point2D isoGridToScreen(Point2D position) {
         return isoGridToScreen(position.getX(), position.getY());
     }
+
     /**
      * Converts isometric grid coordinates to screen coordinates, considering the tile dimensions and origin.
      *
@@ -51,8 +55,8 @@ public class MapService {
      * @return a {@code Point2D} representing the equivalent screen coordinates
      */
     public static Point2D isoGridToScreen(double gridX, double gridY) {
-        double screenX = (ISO_TILE_ORIGIN_X * TILE_WIDTH_ISO) + (gridX - gridY) * (TILE_WIDTH_ISO /2.0);
-        double screenY = ISO_TILE_ORIGIN_Y * TILE_HEIGHT + (gridX + gridY) * (TILE_HEIGHT /2.0);
+        double screenX = (ISO_TILE_ORIGIN_X * TILE_WIDTH_ISO) + (gridX - gridY) * (TILE_WIDTH_ISO / 2.0);
+        double screenY = ISO_TILE_ORIGIN_Y * TILE_HEIGHT + (gridX + gridY) * (TILE_HEIGHT / 2.0);
         return new Point2D(screenX, screenY);
     }
 
@@ -86,28 +90,32 @@ public class MapService {
     /**
      * This method searches through all entities in the game world for the one that has the {@code SelectableComponent}.
      * The game only allows one tank to be selected at all times.
+     *
      * @return the selected tank entity, or {@code null} if no such entity is marked as selected.
      */
-    public static Entity findSelectedTank(){
+    public static Entity findSelectedTank() {
         for (Entity e : FXGL.getGameWorld().getEntities()) {
             if (e.hasComponent(SelectableComponent.class))
                 return e;
         }
         return null;
     }
+
     /**
      * Marks the given tank entity as selected by adding a {@code SelectableComponent}.*
+     *
      * @param tank the tank entity to be marked as selected
      */
-    public static void selectTank(Entity tank){
+    public static void selectTank(Entity tank) {
         tank.addComponent(new SelectableComponent());
     }
 
     /**
      * Deselects the specified tank entity by removing its {@code SelectableComponent}.
+     *
      * @param tank the tank entity to be deselected
      */
-    public static void deSelectTank(Entity tank){
+    public static void deSelectTank(Entity tank) {
         tank.removeComponent(SelectableComponent.class);
     }
 
@@ -116,11 +124,12 @@ public class MapService {
      * This method identifies the selected tank by checking for an entity with a {@code SelectableComponent}
      * which only tanks get assigned.
      */
-    public static void deSelectTank(){
+    public static void deSelectTank() {
         Entity tank = findSelectedTank();
         if (tank != null)
             tank.removeComponent(SelectableComponent.class);
     }
+
     /**
      * Gets all valid neighbor positions for a tank on the game map in a Set.
      * Only returns positions that are within map boundaries and not the tank's current position
@@ -129,7 +138,7 @@ public class MapService {
      * @return Set of valid neighboring positions
      */
 
-    public static Set<Point2D> getTankNeighbours(Point2D tankPos){
+    public static Set<Point2D> getTankNeighbours(Point2D tankPos) {
         Set<Point2D> neighborCells = new HashSet<>();
         for (int x = -5; x <= 5; x++) {
             for (int y = -5; y <= 5; y++) {
@@ -181,11 +190,16 @@ public class MapService {
     // Schritt-Funktion
     private static Point2D step(Point2D pos, Direction dir) {
         switch (dir) {
-            case UP:    return new Point2D(pos.getX(), pos.getY() - 1);
-            case DOWN:  return new Point2D(pos.getX(), pos.getY() + 1);
-            case LEFT:  return new Point2D(pos.getX() - 1, pos.getY());
-            case RIGHT: return new Point2D(pos.getX() + 1, pos.getY());
-            default: throw new IllegalArgumentException();
+            case UP:
+                return new Point2D(pos.getX(), pos.getY() - 1);
+            case DOWN:
+                return new Point2D(pos.getX(), pos.getY() + 1);
+            case LEFT:
+                return new Point2D(pos.getX() - 1, pos.getY());
+            case RIGHT:
+                return new Point2D(pos.getX() + 1, pos.getY());
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
