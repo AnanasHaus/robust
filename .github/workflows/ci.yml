@@ -1,48 +1,26 @@
-name: Continuous Integration
+name: Java CI
 
 on:
   push:
-    branches: [main, tests]
-    paths:
-      - 'RobustServer/**'
-      - '.github/workflows/**'
+    branches: [ main ]
   pull_request:
-    branches: [main, tests]
-    paths:
-      - 'RobustServer/**'
-      - '.github/workflows/**'
+    branches: [ main ]
 
 jobs:
-  test:
+  build-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 21
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
+    - name: Grant execute permission for Gradle
+      run: chmod +x gradlew
 
-      - name: Run tests
-        run: ./gradlew test
-
-      - name: Generate coverage report
-        run: ./gradlew jacocoTestReport
-
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: build/reports/jacoco/test/html
-
-
-
-
-
-
+    - name: Run tests
+      run: ./gradlew test
