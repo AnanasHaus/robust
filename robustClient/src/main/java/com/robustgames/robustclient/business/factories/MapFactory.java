@@ -56,7 +56,7 @@ public class MapFactory implements EntityFactory {
         var cell = FXGL.entityBuilder(data).type(TILE).viewWithBBox(diamond)
                 .onClick(tile -> {
                     MovementService.moveTank(tile);
-                    MovementService.rotateAutomatically(tile);
+                    //MovementService.rotateAutomatically(tile);
                 })
                 .build();
         diamond.fillProperty().bind(
@@ -79,10 +79,8 @@ public class MapFactory implements EntityFactory {
 
     @Spawns("AttackTargetTiles")
     public Entity spawnAttackTargetTiles(SpawnData data) {
-        //rein visuell, braucht eigene methode
-
         return FXGL.entityBuilder(data)
-                .onClick(MovementService::moveTank).type(ACTIONSELECTION)//rein visuell, braucht eigene methode
+                .onClick(MovementService::moveTank).type(ACTIONSELECTION)
                 .viewWithBBox("Tile_attack_selection.png")
                 .build();
     }

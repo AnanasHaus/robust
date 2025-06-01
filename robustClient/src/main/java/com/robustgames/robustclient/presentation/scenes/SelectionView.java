@@ -40,7 +40,6 @@ public class SelectionView extends Pane {
         btnMove = new Button("Move");
         btnMove.getStyleClass().add("robust-btn");
         btnMove.setOnAction(e -> {
-            System.out.println("Movy groovy");
             Entity tank = MapService.findSelectedTank();
             if (tank != null) {
                 resetActionComponents(tank);
@@ -52,7 +51,6 @@ public class SelectionView extends Pane {
         btnShoot = new Button("Shoot");
         btnShoot.getStyleClass().add("robust-btn");
         btnShoot.setOnAction(e -> {
-            System.out.println("Shooty tooty");
             Entity tank = MapService.findSelectedTank();
             if (tank != null) {
                 resetActionComponents(tank);
@@ -63,9 +61,9 @@ public class SelectionView extends Pane {
         btnRotateLeft = new Button("Rotate Left");
         btnRotateLeft.getStyleClass().add("robust-btn");
         btnRotateLeft.setOnAction(e -> {
-            System.out.println("Turn left");
             Entity tank = MapService.findSelectedTank();
             if (tank != null) {
+                tank.getComponent(RotateComponent.class).rotateLeft();
                 resetActionComponents(tank);
                 FXGL.runOnce(() -> tank.addComponent(new RotateComponent()), Duration.seconds(0.01));
                 // Richtung left an Component übergeben
@@ -75,9 +73,9 @@ public class SelectionView extends Pane {
         btnRotateRight = new Button("Rotate Right");
         btnRotateRight.getStyleClass().add("robust-btn");
         btnRotateRight.setOnAction(e -> {
-            System.out.println("Turn right");
             Entity tank = MapService.findSelectedTank();
             if (tank != null) {
+                tank.getComponent(RotateComponent.class).rotateRight();
                 resetActionComponents(tank);
                 FXGL.runOnce(() -> tank.addComponent(new RotateComponent()), Duration.seconds(0.01));
                 // Richtung right an Component übergeben
@@ -107,8 +105,8 @@ public class SelectionView extends Pane {
         HBox box = new HBox(10);
         box.getChildren().addAll(btnMove, btnShoot, btnRotateLeft, btnRotateRight, btnSendTurn);
         box.setAlignment(Pos.CENTER);
-        box.setTranslateX(getAppWidth() / 4.0 - 300);
-        box.setTranslateY(getAppHeight() - 50);
+        this.setTranslateX(getAppWidth() / 4.0 - 300);
+        this.setTranslateY(getAppHeight() - 50);
 
         this.getChildren().add(box);
 
@@ -124,7 +122,6 @@ public class SelectionView extends Pane {
         System.out.println("  Has Movement: " + tank.hasComponent(MovementComponent.class));
         System.out.println("  Has Rotate: " + tank.hasComponent(RotateComponent.class));
         System.out.println("  Has Shoot: " + tank.hasComponent(ShootComponent.class));
-        // Entities entfernen
         getGameWorld().removeEntities(byType(ACTIONSELECTION));
     }
 }
