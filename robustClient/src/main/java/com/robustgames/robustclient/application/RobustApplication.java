@@ -18,6 +18,9 @@ import com.robustgames.robustclient.presentation.scenes.SelectionView;
 import javafx.geometry.Point2D;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.KeyCode; // Für Tastenangabe
+import javafx.scene.text.Text;
+import javafx.scene.paint.Color;
+import com.almasb.fxgl.dsl.FXGL;
 
 import java.util.List;
 
@@ -28,7 +31,16 @@ import static com.robustgames.robustclient.business.entitiy.EntityType.TILE;
 public class RobustApplication extends GameApplication  {
     private static final int WIDTH = 1280;
     private static final int HEIGHT = 720;
+
     SelectionView selectionView;
+
+    private Text apText;
+
+    public void setAPText(String text) {
+        apText.setText(text);
+        double padding = 20;
+        apText.setTranslateX(WIDTH - padding - apText.getLayoutBounds().getWidth());
+    }
 
     @Override
     protected void initSettings(GameSettings settings) {
@@ -59,7 +71,18 @@ public class RobustApplication extends GameApplication  {
         selectionView.setVisible(false);
 
         addUINode(selectionView);
+
+        apText = new Text("AP: 5");
+        apText.setFill(Color.WHITE);
+        apText.setStyle("-fx-font-size: 24px;");
+
+        double padding = 20;
+        apText.setTranslateX(WIDTH - (padding + 25 ) - apText.getLayoutBounds().getWidth());
+        apText.setTranslateY(padding);
+
+        getGameScene().addUINode(apText);
     }
+
     public void onTankClicked(Entity tank) {
         selectionView.setVisible(true);
     }

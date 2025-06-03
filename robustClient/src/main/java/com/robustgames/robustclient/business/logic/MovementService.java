@@ -1,6 +1,8 @@
 package com.robustgames.robustclient.business.logic;
 
+import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
+import com.robustgames.robustclient.application.RobustApplication;
 import com.robustgames.robustclient.business.entitiy.EntityType;
 import com.robustgames.robustclient.business.entitiy.components.APComponent;
 import com.robustgames.robustclient.business.entitiy.components.RotateComponent;
@@ -44,6 +46,9 @@ public class MovementService {
                 Point2D target = clickedCell.getPosition();
                 selectedTank.setPosition(target.getX() - 64, target.getY() - 64);
                 selectedTank.removeComponent(SelectableComponent.class);
+
+                int aktuelleAP = selectedTank.getComponent(APComponent.class).getCurrentAP();
+                ((RobustApplication) FXGL.getApp()).setAPText("AP: " + aktuelleAP);
             }
         }
     }
