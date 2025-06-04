@@ -1,0 +1,19 @@
+name: Check for Debug Comments
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+jobs:
+  debug-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Search for debug comments
+        run: |
+          if grep -riE '// ?debug|/\* ?debug ?\*/' . --exclude-dir=.git; then
+            echo " Debug-Kommentare gefunden. Bitte entfernen."
+            exit 1
+          fi

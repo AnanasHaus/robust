@@ -1,0 +1,15 @@
+name: Prevent Push to Main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  fail-on-main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if pushed to main
+        run: |
+          echo "Direct pushes to main are not allowed!"
+          exit 1
