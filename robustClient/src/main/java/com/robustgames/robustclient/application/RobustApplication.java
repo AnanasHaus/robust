@@ -2,11 +2,14 @@ package com.robustgames.robustclient.application;
 
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
+import com.almasb.fxgl.core.serialization.Bundle;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.GameWorld;
 import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.input.Input;
+import com.almasb.fxgl.multiplayer.MultiplayerService;
+import com.almasb.fxgl.net.Connection;
 import com.robustgames.robustclient.business.collision.ShellCityHandler;
 import com.robustgames.robustclient.business.collision.ShellTankHandler;
 import com.robustgames.robustclient.business.collision.ShellTileHandler;
@@ -18,6 +21,7 @@ import com.robustgames.robustclient.presentation.scenes.SelectionView;
 import javafx.geometry.Point2D;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.KeyCode; // Für Tastenangabe
+import javafx.util.Duration;
 
 import java.util.List;
 
@@ -28,6 +32,8 @@ import static com.robustgames.robustclient.business.entitiy.EntityType.TILE;
 public class RobustApplication extends GameApplication  {
     private static final int WIDTH = 1280;
     private static final int HEIGHT = 720;
+    private boolean isServer;
+    private Connection<Bundle> connection;
     SelectionView selectionView;
 
     @Override
@@ -37,6 +43,7 @@ public class RobustApplication extends GameApplication  {
         settings.getCSSList().add("style.css");
         settings.setWidth(WIDTH);
         settings.setHeight(HEIGHT);
+        settings.addEngineService(MultiplayerService.class); // Multiplayerclass
     }
 
     @Override
@@ -75,25 +82,68 @@ public class RobustApplication extends GameApplication  {
 
     @Override
     protected void initGame() {
-        selectionView = new SelectionView();
-        FXGL.getGameWorld().addEntityFactory(new MapFactory());
-        FXGL.getGameWorld().addEntityFactory(new PlayerFactory());
-        FXGL.spawn("Background", new SpawnData(0, 0).put("width", WIDTH).put("height", HEIGHT));
-        FXGL.setLevelFromMap("mapTest.tmx"); //map2D.tmx für 2D und mapTest.tmx für Isometrisch
+        runOnce(() -> {
+            getDialogService().showConfirmationBox("Are you the host?", yes -> {
+                isServer = yes;
 
-        GameWorld world = getGameWorld();
-        List<Entity> allEntities = world.getEntities().subList(3, world.getEntities().size());
-        for (Entity entity : allEntities) {
-            Point2D orthGridPos = MapService.orthScreenToGrid(entity.getPosition());
-            Point2D isoGridPos = MapService.isoGridToScreen(orthGridPos.getX(), orthGridPos.getY());
-            if (entity.isType(TILE))
-                entity.setPosition(isoGridPos.getX(), isoGridPos.getY());
-            else
-                entity.setPosition(isoGridPos.getX()-64, isoGridPos.getY()-64);
-        }
+                selectionView = new SelectionView();
+                FXGL.getGameWorld().addEntityFactory(new MapFactory());
+                FXGL.getGameWorld().addEntityFactory(new PlayerFactory());
+                FXGL.spawn("Background", new SpawnData(0, 0).put("width", WIDTH).put("height", HEIGHT));
+                FXGL.setLevelFromMap("mapTest.tmx"); //map2D.tmx für 2D und mapTest.tmx für Isometrisch
+
+                GameWorld world = getGameWorld();
+
+                List<Entity> allEntities = world.getEntities().subList(3, world.getEntities().size());
+                for (Entity entity : allEntities) {
+                    Point2D orthGridPos = MapService.orthScreenToGrid(entity.getPosition());
+                    Point2D isoGridPos = MapService.isoGridToScreen(orthGridPos.getX(), orthGridPos.getY());
+                    if (entity.isType(TILE))
+                        entity.setPosition(isoGridPos.getX(), isoGridPos.getY());
+                    else
+                        entity.setPosition(isoGridPos.getX()-64, isoGridPos.getY()-64);
+                }
+
+
+                if (yes) {
+                    var server = getNetService().newTCPServer(55555);
+                    server.setOnConnected(conn -> {
+                        connection = conn;
+
+                        getExecutor().startAsyncFX(() -> onServer());
+                    });
+
+                    server.startAsync();
+
+                } else {
+                    var client = getNetService().newTCPClient("localhost", 55555);
+                    client.setOnConnected(conn -> {
+                        connection = conn;
+
+                        getExecutor().startAsyncFX(() -> onClient());
+                    });
+
+                    client.connectAsync();
+                }
+            });
+        }, Duration.seconds(0.5));
     }
 
-    public static void main(String[] args) {
+    private void onClient() {
+        // muss vermutlich zum server
+        // getService(MultiplayerService.class).addEntityReplicationReceiver(connection, getGameWorld());
+        // getService(MultiplayerService.class).addInputReplicationSender(connection, getInput());
+    }
+
+    private void onServer() {
+
+    }
+
+
+
+    
+
+public static void main(String[] args) {
         launch(args);
     }
 }

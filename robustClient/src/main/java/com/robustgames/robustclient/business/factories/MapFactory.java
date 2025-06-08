@@ -6,6 +6,7 @@ import com.almasb.fxgl.entity.EntityFactory;
 import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.Spawns;
 import com.almasb.fxgl.entity.components.IrremovableComponent;
+import com.almasb.fxgl.multiplayer.NetworkComponent;
 import com.robustgames.robustclient.business.logic.MovementService;
 import javafx.beans.binding.Bindings;
 import javafx.scene.paint.Color;
@@ -23,6 +24,7 @@ public class MapFactory implements EntityFactory {
         return FXGL.entityBuilder(data)
                 .view(new Rectangle(data.<Integer>get("width"), data.<Integer>get("height"), Color.GREY))
                 .with(new IrremovableComponent())
+                .with(new NetworkComponent())
                 .zIndex(-100)
                 .build();
     }
@@ -31,6 +33,7 @@ public class MapFactory implements EntityFactory {
     public Entity spawnMountain(SpawnData data) {
         return FXGL.entityBuilder(data).type(MOUNTAIN)
                 .viewWithBBox("mountain.png")
+                .with(new NetworkComponent())
                 .build();
     }
 
@@ -38,6 +41,7 @@ public class MapFactory implements EntityFactory {
     @Spawns("floorTile")
     public Entity spawnFloor(SpawnData data) {
         return FXGL.entityBuilder(data).type(TILE)
+                .with(new NetworkComponent())
                 .zIndex(-10)
                 .build();
     }
@@ -58,6 +62,7 @@ public class MapFactory implements EntityFactory {
                     MovementService.moveTank(tile);
                     //MovementService.rotateAutomatically(tile);
                 })
+                .with(new NetworkComponent())
                 .build();
         diamond.fillProperty().bind(
                 Bindings.when(cell.getViewComponent().getParent().hoverProperty())
@@ -74,6 +79,7 @@ public class MapFactory implements EntityFactory {
         return FXGL.entityBuilder(data)
                 .onClick(MovementService::moveTank).type(ACTIONSELECTION)
                 .viewWithBBox("Tile_move_selection.png")
+                .with(new NetworkComponent())
                 .build();
     }
     @Spawns("AttackTargetTiles")
@@ -81,6 +87,7 @@ public class MapFactory implements EntityFactory {
         return FXGL.entityBuilder(data)
                 .onClick(MovementService::moveTank).type(ACTIONSELECTION)
                 .viewWithBBox("Tile_attack_selection.png")
+                .with(new NetworkComponent())
                 .build();
     }
 }
