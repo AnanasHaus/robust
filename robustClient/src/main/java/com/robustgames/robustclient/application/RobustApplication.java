@@ -3,21 +3,23 @@ package com.robustgames.robustclient.application;
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.core.serialization.Bundle;
+import com.almasb.fxgl.core.serialization.Bundle;
+import com.almasb.fxgl.net.Client;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.GameWorld;
 import com.almasb.fxgl.entity.SpawnData;
+import com.almasb.fxgl.net.Connection;
 import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.multiplayer.MultiplayerService;
 import com.almasb.fxgl.net.Connection;
-import com.robustgames.robustclient.business.collision.ShellCityHandler;
-import com.robustgames.robustclient.business.collision.ShellTankHandler;
-import com.robustgames.robustclient.business.collision.ShellTileHandler;
 import com.robustgames.robustclient.business.entitiy.components.RotateComponent;
 import com.robustgames.robustclient.business.factories.MapFactory;
 import com.robustgames.robustclient.business.factories.PlayerFactory;
 import com.robustgames.robustclient.business.logic.MapService;
-import com.robustgames.robustclient.presentation.scenes.SelectionView;
+import com.robustgames.robustclient.presentation.scenes.TankButtonView;
+import com.robustgames.robustclient.presentation.scenes.TankDataView;
+import com.robustgames.robustclient.presentation.scenes.EndTurnView;
 import javafx.geometry.Point2D;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.KeyCode; // Für Tastenangabe
@@ -26,15 +28,18 @@ import javafx.util.Duration;
 import java.util.List;
 
 import static com.almasb.fxgl.dsl.FXGL.*;
-import static com.robustgames.robustclient.business.entitiy.EntityType.MOUNTAIN;
+import static com.robustgames.robustclient.business.entitiy.EntityType.*;
+
 import static com.robustgames.robustclient.business.entitiy.EntityType.TILE;
 
-public class RobustApplication extends GameApplication  {
+public class RobustApplication extends GameApplication {
     private static final int WIDTH = 1280;
     private static final int HEIGHT = 720;
-    private boolean isServer;
+    TankButtonView tankButtonView;
+    TankDataView tankDataView;
+    EndTurnView endTurnView;
+
     private Connection<Bundle> connection;
-    SelectionView selectionView;
 
     @Override
     protected void initSettings(GameSettings settings) {
@@ -48,8 +53,13 @@ public class RobustApplication extends GameApplication  {
 
     @Override
     protected void initInput() {
+        onBtnDown(MouseButton.SECONDARY, () -> {
+            MapService.deSelectTank();
+            tankDataView.setVisible(false);
+            tankButtonView.setVisible(false);
+        });
 
-        //Click Debug
+        //ROBUST_DEBUG
 //        onBtnDown(MouseButton.PRIMARY, () -> {
 //            Point2D mouseWorldPos = FXGL.getInput().getMousePositionWorld();
 //            Point2D gridPos = MapService.isoScreenToGrid(mouseWorldPos);
@@ -63,87 +73,59 @@ public class RobustApplication extends GameApplication  {
 
     @Override
     protected void initUI() {
-        selectionView.setVisible(false);
+        endTurnView.setVisible(true);
+        tankButtonView.setVisible(false);
+        tankDataView.setVisible(false);
+        addUINode(endTurnView);
+        addUINode(tankButtonView);
+        addUINode(tankDataView);
+    }
 
-        addUINode(selectionView);
-    }
     public void onTankClicked(Entity tank) {
-        selectionView.setVisible(true);
-    }
-    @Override
-    protected void initPhysics() {
-        var shellTank = new ShellTankHandler();
-        getPhysicsWorld().addCollisionHandler(shellTank);
-        //getPhysicsWorld().addCollisionHandler(shellTank.copyFor(SHELL, OTHERENTITYTYPE)); TODO Other Entity Types possible
-        var shellCity = new ShellCityHandler();
-        getPhysicsWorld().addCollisionHandler(shellCity);
-        getPhysicsWorld().addCollisionHandler(new ShellTileHandler());
+        //hp bar visible
+        tankButtonView.setVisible(true);
+        tankDataView.setVisible(true);
+        tankDataView.setSelectedTank(tank);
     }
 
     @Override
     protected void initGame() {
-        runOnce(() -> {
-            getDialogService().showConfirmationBox("Are you the host?", yes -> {
-                isServer = yes;
+        getGameScene().getViewport().setY(-100);
+        // getGameScene().getViewport().setZoom(100);
 
-                selectionView = new SelectionView();
-                FXGL.getGameWorld().addEntityFactory(new MapFactory());
-                FXGL.getGameWorld().addEntityFactory(new PlayerFactory());
-                FXGL.spawn("Background", new SpawnData(0, 0).put("width", WIDTH).put("height", HEIGHT));
-                FXGL.setLevelFromMap("mapTest.tmx"); //map2D.tmx für 2D und mapTest.tmx für Isometrisch
+        tankButtonView = new TankButtonView(); // Sofort bauen!
+        tankDataView = new TankDataView();
+        endTurnView = new EndTurnView();
 
-                GameWorld world = getGameWorld();
+        Client<Bundle> client = getNetService().newTCPClient("localhost", 55555);
+        client.setOnConnected(conn -> {
+            connection = conn; // Merke die Connection für spätere Sends
+            // Nachlieferung!
+            tankButtonView.setConnection(connection);
+        });
+        client.connectAsync();
 
-                List<Entity> allEntities = world.getEntities().subList(3, world.getEntities().size());
-                for (Entity entity : allEntities) {
-                    Point2D orthGridPos = MapService.orthScreenToGrid(entity.getPosition());
-                    Point2D isoGridPos = MapService.isoGridToScreen(orthGridPos.getX(), orthGridPos.getY());
-                    if (entity.isType(TILE))
-                        entity.setPosition(isoGridPos.getX(), isoGridPos.getY());
-                    else
-                        entity.setPosition(isoGridPos.getX()-64, isoGridPos.getY()-64);
-                }
+        tankDataView = new TankDataView();
+        endTurnView = new EndTurnView();
 
+        FXGL.getGameWorld().addEntityFactory(new MapFactory());
+        FXGL.getGameWorld().addEntityFactory(new PlayerFactory());
+        FXGL.spawn("Background", new SpawnData(0, -100).put("width", WIDTH).put("height", HEIGHT));
+        FXGL.setLevelFromMap("mapTest.tmx"); //map2D.tmx für 2D und mapTest.tmx für Isometrisch
 
-                if (yes) {
-                    var server = getNetService().newTCPServer(55555);
-                    server.setOnConnected(conn -> {
-                        connection = conn;
-
-                        getExecutor().startAsyncFX(() -> onServer());
-                    });
-
-                    server.startAsync();
-
-                } else {
-                    var client = getNetService().newTCPClient("localhost", 55555);
-                    client.setOnConnected(conn -> {
-                        connection = conn;
-
-                        getExecutor().startAsyncFX(() -> onClient());
-                    });
-
-                    client.connectAsync();
-                }
-            });
-        }, Duration.seconds(0.5));
+        GameWorld world = getGameWorld();
+        List<Entity> allEntities = world.getEntities(); //.subList(2, world.getEntities().size()) -> weil die Texturen Entitaeten sind, die wir nicht mit TYPE filtern koennen
+        for (Entity entity : allEntities) {
+            Point2D orthGridPos = MapService.orthScreenToGrid(entity.getPosition());
+            Point2D isoGridPos = MapService.isoGridToScreen(orthGridPos.getX(), orthGridPos.getY());
+            if (entity.isType(TILE)) {
+                entity.setPosition(isoGridPos.getX(), isoGridPos.getY());
+            } else if (entity.isType(MOUNTAIN) || entity.isType(TANK) || entity.isType(CITY))
+                entity.setPosition(isoGridPos.getX() - 64, isoGridPos.getY() - 64);
+        }
     }
 
-    private void onClient() {
-        // muss vermutlich zum server
-        // getService(MultiplayerService.class).addEntityReplicationReceiver(connection, getGameWorld());
-        // getService(MultiplayerService.class).addInputReplicationSender(connection, getInput());
-    }
-
-    private void onServer() {
-
-    }
-
-
-
-    
-
-public static void main(String[] args) {
+    public static void main(String[] args) {
         launch(args);
     }
 }
