@@ -4,6 +4,7 @@ import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.core.serialization.Bundle;
 import com.almasb.fxgl.core.serialization.Bundle;
+import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.net.Client;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
@@ -25,6 +26,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.KeyCode; // Für Tastenangabe
 import javafx.util.Duration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.almasb.fxgl.dsl.FXGL.*;
@@ -127,5 +129,14 @@ public class RobustApplication extends GameApplication {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    public static void bundlepack(Entity entity, String entity_name){
+
+        Bundle bundle = new Bundle(entity_name);
+        bundle.put("PanzerComponents", new ArrayList<Component>(entity.getComponents()));
+        //DEBUG
+        ArrayList<Component> compo = new ArrayList<Component>(entity.getComponents());
+        System.out.println(compo);
     }
 }
