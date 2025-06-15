@@ -5,6 +5,8 @@ import com.almasb.fxgl.entity.component.Component;
 import com.robustgames.robustclient.business.logic.MapService;
 import com.robustgames.robustclient.business.logic.Direction;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
+import javafx.scene.image.ImageView;
 
 import java.util.List;
 
@@ -63,6 +65,49 @@ public class ShootComponent extends Component {
         }
         throw new IllegalArgumentException();
     }
+
+    public void onHoverTargetTile(Point2D tileGridPos, Entity selectedTank) {
+
+        Point2D tankGridPos = MapService.isoScreenToGrid(selectedTank.getCenter());
+        Point2D diff = tileGridPos.subtract(tankGridPos);
+
+        String currentImage = getTankImageFilename(selectedTank);
+
+        String richtung = "";
+        if (diff.getX() == 0 && diff.getY() < 0) {
+            richtung = "UP";
+        } else if (diff.getX() == 0 && diff.getY() > 0) {
+            richtung = "DOWN";
+        } else if (diff.getY() == 0 && diff.getX() > 0) {
+            richtung = "RIGHT";
+        } else if (diff.getY() == 0 && diff.getX() < 0) {
+            richtung = "LEFT";
+        }
+
+        switch (currentImage){
+            case "tank_top_left.png" -> System.out.println("Tank: " + currentImage + " Hover: " + richtung);
+
+            case "tank_top_right.png" -> System.out.println("Tank: " + currentImage + " Hover: " + richtung);
+
+            case "tank_bottom_left.png" -> System.out.println("Tank: " + currentImage + " Hover: " + richtung);
+
+            case "tank_bottom_right.png" -> System.out.println("Tank: " + currentImage + " Hover: " + richtung);
+
+        }
+    }
+
+    private String getTankImageFilename(Entity tank) {
+        for (Node e : tank.getViewComponent().getChildren()) {
+            if (e instanceof ImageView iv) {
+                String url = iv.getImage().getUrl();
+                if (url.contains("tank")) {
+                    return url.substring(url.lastIndexOf("/") + 1);
+                }
+            }
+        }
+        return "";
+    }
+
     @Override
     public void onRemoved() {
         getGameWorld().removeEntities(byType(ACTIONSELECTION));

@@ -8,6 +8,7 @@ import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.Spawns;
 import com.almasb.fxgl.entity.components.IrremovableComponent;
 import com.robustgames.robustclient.business.entitiy.components.ShellComponent;
+import com.robustgames.robustclient.business.entitiy.components.ShootComponent;
 import com.robustgames.robustclient.business.logic.MapService;
 import com.robustgames.robustclient.business.logic.MovementService;
 import javafx.beans.binding.Bindings;
@@ -89,13 +90,29 @@ public class MapFactory implements EntityFactory {
         Entity target = data.get("target");
         String targetName = data.get("targetName");
 
-        return FXGL.entityBuilder(data)
+        var view = FXGL.getAssetLoader().loadTexture(targetName);
+
+        var entity = FXGL.entityBuilder(data)
                 .onClick(e -> MapService.shoot(target))
                 .type(ACTIONSELECTION)
-                .zIndex(target.getZIndex()+1)
-                .viewWithBBox(targetName)
+                .zIndex(target.getZIndex() + 1)
+                .viewWithBBox(view)
                 .build();
+
+        view.hoverProperty().addListener((obs, wasHovered, isNowHovered) -> {
+            if (isNowHovered) {
+                //System.out.println(">> Hover über Tile an Position (grid): " + MapService.isoScreenToGrid(entity.getCenter()));
+                Entity tank = MapService.findSelectedTank();
+                tank.getComponent(ShootComponent.class).onHoverTargetTile(MapService.isoScreenToGrid(entity.getCenter()), tank);
+            }
+        });
+
+        return entity;
     }
+
+
+
+
 
     @Spawns("shell")
     public Entity spawnShell(SpawnData data) {
