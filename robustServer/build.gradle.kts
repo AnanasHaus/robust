@@ -28,12 +28,13 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.boot:spring-boot-starter-web")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
-    testImplementation("com.almasb:fxgl-test:11.17")
+    //testImplementation("com.almasb:fxgl-test:11.17")
 }
 
 tasks.test {
